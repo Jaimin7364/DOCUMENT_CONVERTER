@@ -5,35 +5,23 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Step to build and install the parent POM
+# Step to build and install the project
 - task: Maven@3
   inputs:
-    mavenPomFile: 'pom.xml'   # Path to the parent POM
+    mavenPomFile: 'pom.xml'  # Points to the correct POM file at the root
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
-    goals: 'clean install'    # Install the parent POM into the local repository
+    goals: 'clean package'  # Standard goal for building and packaging the project
 
-# Step to build the webapp module
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'webapp/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'clean package'
-
-# Copy the WAR file to the artifact staging directory
+# Copy the JAR file to the artifact staging directory (adjust if it's not a JAR)
 - task: CopyFiles@2
   inputs:
-    contents: 'webapp/target/*.war'   # Path to your WAR file
+    contents: 'target/*.jar'   # Adjust if your project generates a JAR
     targetFolder: '$(Build.ArtifactStagingDirectory)'
 
-# Publish the WAR file as an artifact
+# Publish the JAR file as an artifact
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
